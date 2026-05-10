@@ -1,4 +1,36 @@
-# RACE Reading Comprehension Project
+# ML Quiz Generator
+
+An intelligent reading-comprehension quiz generation system built on the RACE dataset. The project combines traditional machine learning, an optional BERT verifier, automatic question generation, distractor generation, graduated hints, model evaluation, and a Streamlit quiz interface.
+
+**GitHub About description:** Machine learning quiz generator for RACE reading-comprehension passages with Model A answer verification/question generation, Model B distractors/hints, evaluation reports, and a Streamlit UI.
+
+<p align="center">
+  <img src="report/assets/3comaprisons.png" alt="Model comparison summary" width="820">
+</p>
+
+## Introduction
+
+This project turns a reading passage into an interactive multiple-choice quiz workflow. Model A generates or verifies questions and answers using a rubric-aligned classical LR + XGBoost pipeline, with optional BERT multiple-choice inference for stronger answer selection. Model B generates plausible distractors and three progressively revealing hints so the UI behaves like a real study tool rather than just a classifier demo.
+
+The repository includes the source code, tracked runtime artifacts for the classical demo, evaluation outputs, notebooks, final report, and presentation. It is designed so an evaluator can inspect the machine-learning pipeline, run inference, view plots, and understand the results directly from the GitHub project page.
+
+## Visual Overview
+
+| Model Evaluation | Answer Distribution |
+| --- | --- |
+| <img src="report/eda_outputs/eda_outputs/baseline_metrics.png" alt="Baseline metric comparison" width="420"> | <img src="report/eda_outputs/eda_outputs/answer_distribution.png" alt="Answer distribution by split" width="420"> |
+
+| Text Lengths | Lexical Overlap |
+| --- | --- |
+| <img src="report/eda_outputs/eda_outputs/text_length_boxplots.png" alt="Text length boxplots" width="420"> | <img src="report/eda_outputs/eda_outputs/lexical_overlap.png" alt="Lexical overlap summary" width="420"> |
+
+## Highlights
+
+- End-to-end quiz generation from RACE or custom passages.
+- Model A: traditional answer verification, question generation, unsupervised clustering, ensemble comparison, and optional BERT backend.
+- Model B: passage-grounded distractors, ML ranking, diversity filtering, and three graduated hints.
+- Evaluation: BLEU, ROUGE-L, METEOR, exact-match diagnostics, Precision@3, Recall@3, F1@3, silhouette, purity, MRR, and latency.
+- Streamlit UI with article input, generated quiz, progressive hints, answer checking, analytics, and CSV export.
 
 This folder contains the project dataset, source code, UI, notebooks, models, evaluation outputs, reports, and optional BERT backend.
 
