@@ -55,6 +55,9 @@ checkpoints/
 # Local app secrets
 .streamlit/secrets.toml
 
+# Local coursework/admin files
+AL2002_ProjectRubric.docx
+
 # Large demo media and local exports
 *.mp4
 *.mov
