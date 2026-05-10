@@ -189,6 +189,7 @@ def fit_distractor_matrices(rows):
     artifacts = {
         "distractor_text_vectorizer": text_vectorizer,
         "distractor_category_vectorizer": category_vectorizer,
+        "distractor_numeric_features": list(DISTRACTOR_NUMERIC_FEATURES),
     }
     return hstack([X_text, X_cat, X_num]).tocsr(), hstack([X_cat, X_num]).tocsr(), artifacts
 

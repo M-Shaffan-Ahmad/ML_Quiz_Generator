@@ -7,6 +7,7 @@ TARGETS = {
     "model-a-bert": "evaluate_bert_multiple_choice_model_a",
     "model-a-bert-text": "evaluate_bert_model_a",
     "model-b": "train_model_b",
+    "model-b-text": "evaluate_model_b_generation",
 }
 
 

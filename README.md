@@ -15,11 +15,22 @@ This folder contains the project dataset, source code, UI, notebooks, models, ev
 - `src/model_b_train.py` - rubric entrypoint for Model B training.
 - `src/inference.py` - rubric entrypoint for Model A, Model A generator, and Model B inference.
 - `src/evaluate.py` - rubric entrypoint for evaluation targets.
+- `src/evaluate_model_b_generation.py` - BLEU/ROUGE-L/METEOR evaluation for Model B distractor text quality.
 - `ui/app.py` and `ui/components/` - Streamlit interface. Root `app.py` is a compatibility wrapper.
 - `notebooks/EDA.ipynb` and `notebooks/experiments.ipynb` - EDA and experiment logs.
 - `tests/` - smoke tests for inference artifacts and project layout.
 - `report/final_report.pdf` - final report, with editable Markdown/DOCX copies in `report/`.
 - `bts/` - behind-the-scenes experiment outputs, old checkpoints, scratch results, and versions.
+
+## GitHub Demo Artifacts
+
+The repository tracks the important runtime artifacts needed for the classical demo:
+`data/raw/dev.csv`, `data/raw/test.csv`, the classical Model A `.joblib` files, the Model A
+generator artifact, the Model A unsupervised artifact, and the Model B artifact. The very
+large raw `train.csv`, extracted `data/raw/RACE/` folder, and BERT/neural checkpoints stay
+ignored to keep the repository pushable under normal GitHub limits. To retrain everything
+from scratch, restore the full RACE training data locally under `data/raw/`; to demo the
+advanced BERT backend, restore or download the checkpoint under `models/model_a/neural/`.
 
 ## Current Best Model A Result
 
@@ -223,7 +234,8 @@ Model B now uses the question-type labels from Model A (`who`, `what`, `where`, 
 passage-grounded distractors, using extracted passage phrases and action/prepositional
 phrase patterns so the wrong options still look connected to the article. The final
 distractor ranker also uses TF-IDF text features, answer type compatibility, lexical
-overlap, character similarity, passage frequency, candidate source, and a diversity filter.
+overlap, one-hot/binary cosine similarity to the correct answer, character similarity,
+passage frequency, candidate source, and a diversity filter.
 
 Train or refresh Model B artifacts:
 
@@ -242,6 +254,7 @@ Saved artifacts:
 models/model_b/traditional/model_b_artifacts.joblib
 models/model_b/traditional/model_b_distractor_results.csv
 models/model_b/traditional/model_b_hint_results.csv
+models/model_b/traditional/model_b_generation_text_metrics.csv
 models/model_b/traditional/model_b_examples.csv
 models/model_b/traditional/model_b_training_summary.json
 ```
@@ -257,12 +270,27 @@ Current Model B results:
 | Hint ranker | Logistic Regression | dev | Top-1 0.7232 | MRR 0.8362 | 2500 questions |
 | Hint ranker | Logistic Regression | test | Top-1 0.7392 | MRR 0.8436 | 2500 questions |
 
+Model B distractor text metrics against official RACE wrong-answer references:
+
+| split | mode | BLEU | ROUGE-L | METEOR | exact text match |
+| ----- | ---- | ---- | ------- | ------ | ---------------- |
+| dev | option pool | 0.8688 | 0.9672 | 0.8477 | 0.9647 |
+| test | option pool | 0.8998 | 0.9770 | 0.8729 | 0.9760 |
+| dev | passage grounded | 0.0142 | 0.0955 | 0.0674 | 0.0195 |
+| test | passage grounded | 0.0149 | 0.0737 | 0.0537 | 0.0081 |
+
 The distractor metrics are option-pool ranking metrics: during supervised evaluation, the
 candidate pool contains the official RACE wrong options, the correct option, and sampled
 passage candidates. This measures whether the model can identify plausible distractors
 from a labelled candidate pool. In runtime passage-only generation, the system uses
 passage candidates only and relies more heavily on heuristic type, form, overlap,
 frequency, and diversity rules.
+
+Regenerate the Model B text metrics:
+
+```bash
+../venv/bin/python src/evaluate_model_b_generation.py --max-eval-rows 500
+```
 
 Generate distractors and hints:
 

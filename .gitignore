@@ -29,15 +29,22 @@ Thumbs.db
 .~lock.*
 
 # Full RACE data and generated data tables
-data/raw/
+data/raw/*
+!data/raw/dev.csv
+!data/raw/test.csv
 data/processed/*.csv
 !data/processed/preprocessing_summary.csv
 
 # Large model checkpoints and binary artifacts.
 # Keep small CSV/JSON summaries and plots under models/ so results remain visible.
-models/model_a/neural/
+models/model_a/neural/*
+!models/model_a/neural/.gitkeep
 models/**/checkpoint*/
 models/**/*.joblib
+!models/model_a/traditional/*.joblib
+!models/model_a/traditional/generator/generator_artifacts.joblib
+!models/model_a/traditional/unsupervised/model_a_unsupervised.joblib
+!models/model_b/traditional/model_b_artifacts.joblib
 models/**/*.ckpt
 models/**/*.safetensors
 models/**/*.bin

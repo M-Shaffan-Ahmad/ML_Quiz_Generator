@@ -30,7 +30,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MODEL_B_DIR = PROJECT_ROOT / "models" / "model_b" / "traditional"
 MODEL_B_ARTIFACT_FILE = "model_b_artifacts.joblib"
 
-DISTRACTOR_NUMERIC_FEATURES = [
+DISTRACTOR_NUMERIC_FEATURES_LEGACY = [
     "same_answer_type",
     "compatible_question_type",
     "candidate_word_count",
@@ -49,6 +49,11 @@ DISTRACTOR_NUMERIC_FEATURES = [
     "candidate_in_question",
     "candidate_in_article",
     "sentence_position_ratio",
+]
+
+DISTRACTOR_NUMERIC_FEATURES = [
+    *DISTRACTOR_NUMERIC_FEATURES_LEGACY,
+    "one_hot_cosine_to_correct",
 ]
 
 HINT_NUMERIC_FEATURES = [
@@ -255,6 +260,14 @@ class ModelBOutput:
 
 def char_similarity(left, right):
     return SequenceMatcher(None, str(left).lower(), str(right).lower()).ratio()
+
+
+def one_hot_cosine_similarity(left, right):
+    left_terms = set(answer_tokens(left))
+    right_terms = set(answer_tokens(right))
+    if not left_terms or not right_terms:
+        return 0.0
+    return len(left_terms & right_terms) / float(np.sqrt(len(left_terms) * len(right_terms)))
 
 
 def mask_answer(sentence, answer):
@@ -470,6 +483,7 @@ def build_distractor_feature(candidate, article, question, correct_answer, quest
         "length_ratio": len(candidate_text) / max(len(correct_answer), 1),
         "length_difference_abs": abs(len(candidate_text) - len(correct_answer)),
         "candidate_correct_jaccard": jaccard_overlap(candidate_text, correct_answer),
+        "one_hot_cosine_to_correct": one_hot_cosine_similarity(candidate_text, correct_answer),
         "candidate_question_jaccard": jaccard_overlap(candidate_text, question),
         "candidate_article_jaccard": jaccard_overlap(candidate_text, article),
         "candidate_sentence_jaccard": jaccard_overlap(candidate_text, source_sentence),
@@ -483,6 +497,7 @@ def build_distractor_feature(candidate, article, question, correct_answer, quest
 
 
 def distractor_features_to_matrix(rows, artifacts):
+    numeric_features = artifacts.get("distractor_numeric_features", DISTRACTOR_NUMERIC_FEATURES_LEGACY)
     cat = artifacts["distractor_category_vectorizer"].transform(
         [
             {
@@ -496,7 +511,7 @@ def distractor_features_to_matrix(rows, artifacts):
     )
     numeric = csr_matrix(
         np.asarray(
-            [[float(row.get(name, 0.0)) for name in DISTRACTOR_NUMERIC_FEATURES] for row in rows],
+            [[float(row.get(name, 0.0)) for name in numeric_features] for row in rows],
             dtype=np.float32,
         )
     )
@@ -514,6 +529,7 @@ def heuristic_distractor_score(feature):
     score += 0.15 * min(float(feature["candidate_frequency"]), 3.0) / 3.0
     score += 0.10 * min(float(feature["candidate_article_jaccard"]) * 8.0, 1.0)
     score += 0.08 * max(0.0, 1.0 - min(abs(float(feature["length_ratio"]) - 1.0), 1.0))
+    score += 0.05 * min(float(feature.get("one_hot_cosine_to_correct", 0.0)) * 2.0, 1.0)
     if feature["candidate_word_count"] >= 2:
         score += 0.10
     elif feature["correct_word_count"] >= 2 and feature["candidate_type"] not in {"number", "date", "named_entity", "person_or_named_entity"}:

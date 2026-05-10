@@ -7,7 +7,7 @@ This project builds an end-to-end reading-comprehension quiz system on the RACE 
 Reading-comprehension systems are useful when they can do more than select an answer: they should also explain, generate practice material, and support an interactive learner workflow. This project addresses that broader goal by combining answer verification, question generation, distractor generation, hint generation, and a Streamlit quiz interface. The RACE dataset is a strong fit because it contains middle-school and high-school exam passages with four-option multiple-choice questions that require both lexical matching and reasoning [1]. The motivation is to build a reproducible university-project pipeline that satisfies traditional machine-learning requirements while also comparing an advanced neural BERT backend.
 
 ## Related Work
-The dataset foundation follows RACE, a large-scale reading-comprehension benchmark collected from English examinations and designed to test understanding and reasoning [1]. Logistic Regression provides a traditional supervised baseline for binary option scoring [2], while Random Forests and XGBoost support non-linear tree-based ranking and boosted decision-tree comparison [3, 4]. The optional neural backend uses BERT, which fine-tunes bidirectional Transformer representations for downstream NLP tasks including question answering [5]. Finally, ROUGE and METEOR are established automatic text-overlap metrics that support the answer-text evaluation discussion [6, 7].
+The dataset foundation follows RACE, a large-scale reading-comprehension benchmark collected from English examinations and designed to test understanding and reasoning [1]. Logistic Regression provides a traditional supervised baseline for binary option scoring [2], while Random Forests and XGBoost support non-linear tree-based ranking and boosted decision-tree comparison [3, 4]. The optional neural backend uses BERT, which fine-tunes bidirectional Transformer representations for downstream NLP tasks including question answering [5]. Finally, BLEU, ROUGE, and METEOR are established automatic text-overlap metrics that support the answer-text and distractor-text evaluation discussion [6, 7, 8].
 
 ## Project Context
 This project uses the local RACE dataset for an answer-verification style multiple-choice reading-comprehension task. Each question has four candidate answers. The model ranks the answer options, converts the selected option letter back to answer text, and evaluates that text with BLEU, ROUGE-L, and METEOR.
@@ -588,7 +588,7 @@ Application in the project:
 
 - Candidate extraction: Model B extracts passage candidates using the same span extraction tools used by Model A generation, plus additional passage-grounded action phrase and prepositional phrase patterns. During supervised training/evaluation it also includes the four RACE answer options so official wrong answers can be labelled as positive distractors and the correct option can be labelled as a negative candidate.
 - Question-type control: `infer_question_type()` maps each question to `cloze`, `who`, `what`, `where`, `when`, `why`, `how_many`, `which`, or `other`. This type is used as a categorical ML feature and as a compatibility rule for candidate answer types.
-- Distractor features: TF-IDF text features over question/correct answer/candidate/source sentence, answer type, question type, candidate source, word/character lengths, length ratios, lexical overlap, character-level similarity, passage frequency, and sentence position.
+- Distractor features: TF-IDF text features over question/correct answer/candidate/source sentence, answer type, question type, candidate source, word/character lengths, length ratios, lexical overlap, one-hot/binary cosine similarity to the correct answer, character-level similarity, passage frequency, and sentence position.
 - Distractor ranker: Logistic Regression and Random Forest were compared. The selected runtime ranker is Logistic Regression with full text + structured features. A diversity filter removes near-duplicates and subset/superset candidates.
 - Hint features: sentence/question overlap, sentence/answer overlap, sentence length, sentence position, whether the sentence contains the answer, and whether it contains important question terms.
 - Hint ranker: Logistic Regression ranks passage sentences. The runtime now turns the ranked evidence into three non-repeating levels: Hint 1 is vague, Hint 2 is moderate/contextual, and Hint 3 is the near-explicit masked sentence.
@@ -611,6 +611,17 @@ Distractor ranker results:
 | Logistic Regression | test | 0.9999 | 1.0000 | 0.9999 | 0.9999 | 1.0000 | 0.9999 |
 | Random Forest | dev  | 0.9995 | 1.0000 | 0.9997 | 0.9995 | 1.0000 | 0.9997 |
 | Random Forest | test | 0.9999 | 1.0000 | 0.9999 | 0.9999 | 1.0000 | 0.9999 |
+
+Distractor generation text-overlap metrics:
+
+| split | mode | BLEU | ROUGE-L | METEOR | exact text match |
+| ----- | ---- | ---- | ------- | ------ | ---------------- |
+| dev  | option pool | 0.8688 | 0.9672 | 0.8477 | 0.9647 |
+| test | option pool | 0.8998 | 0.9770 | 0.8729 | 0.9760 |
+| dev  | passage grounded | 0.0142 | 0.0955 | 0.0674 | 0.0195 |
+| test | passage grounded | 0.0149 | 0.0737 | 0.0537 | 0.0081 |
+
+These BLEU/ROUGE-L/METEOR scores are computed by `src/evaluate_model_b_generation.py` over 500 dev and 500 test questions per mode. In option-pool mode, the candidate pool includes the official RACE answer options, so high text overlap means the ranker recovers the labelled wrong answers. In passage-grounded mode, Model B intentionally generates wrong options from passage spans rather than copying the official multiple-choice distractors, so lexical-overlap metrics are lower even when the distractors are passage-related and usable for the demo.
 
 Important interpretation: these are option-pool ranking metrics. The supervised candidate pool contains the official RACE wrong options, the correct option, and sampled passage candidates. Therefore, the result shows that Model B can identify official plausible distractors from a labelled candidate pool. Runtime generation in the UI now defaults to passage-grounded candidates, so its output is more faithful to the assignment demo but naturally less perfect than option-pool evaluation.
 
@@ -648,16 +659,17 @@ Artifacts:
 - `models/model_b/traditional/model_b_artifacts.joblib`
 - `models/model_b/traditional/model_b_distractor_results.csv`
 - `models/model_b/traditional/model_b_hint_results.csv`
+- `models/model_b/traditional/model_b_generation_text_metrics.csv`
 - `models/model_b/traditional/model_b_examples.csv`
 - `models/model_b/traditional/model_b_training_summary.json`
 
-Conclusion for Model B: the implementation matches the assignment techniques by combining candidate extraction, TF-IDF/cosine-style similarity features, character matching, passage frequency, Logistic Regression/Random Forest ranking, diversity filtering, and rule-based plus ML-ranked hints. The Streamlit app now exposes Model B and can load generated distractors back into the Model A verifier for end-to-end testing.
+Conclusion for Model B: the implementation matches the assignment techniques by combining candidate extraction, TF-IDF features, one-hot/binary cosine similarity, character matching, passage frequency, Logistic Regression/Random Forest ranking, diversity filtering, BLEU/ROUGE-L/METEOR distractor evaluation, and rule-based plus ML-ranked hints. The Streamlit app now exposes Model B and can load generated distractors back into the Model A verifier for end-to-end testing.
 
 ## User Interface Description
 The Streamlit interface is organized as an end-to-end quiz lab. The user starts with a RACE passage or custom article, runs Model A question/correct-answer generation, receives Model B distractors and hints, selects an answer, and checks the result. The interface also supports backend switching between BERT multiple-choice and the classical LR + XGBoost verifier, manual A/B/C/D option entry, RACE sample browsing, generated-question details, option scores, confidence charts, latency tracking, session analytics, CSV export, and downloadable JSON outputs.
 
 ## Evaluation & Discussion
-The strongest simple baseline is highest article-option overlap, confirming that lexical matching is useful. The final classical Model A improves over that baseline with test BLEU 0.4106, ROUGE-L 0.4922, METEOR 0.4438, and exact-match diagnostic 0.3739. The BERT multiple-choice backend is the strongest measured verifier, reaching test BLEU 0.5431, ROUGE-L 0.6073, METEOR 0.5526, and exact 0.5172. Model A generation is strongest at candidate ranking, with test top-1 candidate accuracy 0.9833 and MRR 0.9870. The K-Means layer is useful for analysis and metadata but not strong enough to replace supervised answer verification. Model B achieves near-perfect option-pool distractor ranking, but those numbers should be interpreted carefully because the supervised pool includes official RACE wrong options. Hint ranking is more realistic and harder, with test top-1 sentence accuracy 0.7392 and MRR 0.8436.
+The strongest simple baseline is highest article-option overlap, confirming that lexical matching is useful. The final classical Model A improves over that baseline with test BLEU 0.4106, ROUGE-L 0.4922, METEOR 0.4438, and exact-match diagnostic 0.3739. The BERT multiple-choice backend is the strongest measured verifier, reaching test BLEU 0.5431, ROUGE-L 0.6073, METEOR 0.5526, and exact 0.5172. Model A generation is strongest at candidate ranking, with test top-1 candidate accuracy 0.9833 and MRR 0.9870. The K-Means layer is useful for analysis and metadata but not strong enough to replace supervised answer verification. Model B achieves near-perfect option-pool distractor ranking and strong option-pool text overlap against official wrong answers, with test BLEU 0.8998, ROUGE-L 0.9770, and METEOR 0.8729. Those numbers should be interpreted carefully because the supervised pool includes official RACE wrong options; passage-grounded runtime generation is more faithful to the demo but naturally lower on lexical-overlap metrics. Hint ranking is more realistic and harder, with test top-1 sentence accuracy 0.7392 and MRR 0.8436.
 
 ## Limitations & Future Work
 The classical verifier still depends heavily on lexical and engineered similarity features, so it can miss answers requiring deeper paraphrase or multi-sentence reasoning. The BERT backend performs better but is more expensive to train and run, especially without GPU access. The question generator uses explainable templates rather than a neural sequence-to-sequence model, so some WH questions can sound rigid. The Model B distractor metrics are strongest in the option-pool setting; passage-only runtime distractors are more faithful to the demo but naturally less perfect. Future work should improve semantic distractor quality, add stronger neural or retrieval-augmented generation for questions, evaluate with human judges, calibrate model confidence, and run ablation studies for feature groups and question types.
@@ -684,6 +696,8 @@ The dataset is clean after preprocessing, the official splits show no exact leak
 
 [5] Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. NAACL 2019. [https://aclanthology.org/N19-1423/](https://aclanthology.org/N19-1423/)
 
-[6] Chin-Yew Lin. 2004. ROUGE: A Package for Automatic Evaluation of Summaries. Text Summarization Branches Out. [https://aclanthology.org/W04-1013/](https://aclanthology.org/W04-1013/)
+[6] Kishore Papineni, Salim Roukos, Todd Ward, and Wei-Jing Zhu. 2002. BLEU: a Method for Automatic Evaluation of Machine Translation. ACL 2002. [https://aclanthology.org/P02-1040/](https://aclanthology.org/P02-1040/)
 
-[7] Satanjeev Banerjee and Alon Lavie. 2005. METEOR: An Automatic Metric for MT Evaluation with Improved Correlation with Human Judgments. ACL Workshop on Intrinsic and Extrinsic Evaluation Measures. [https://aclanthology.org/W05-0909/](https://aclanthology.org/W05-0909/)
+[7] Chin-Yew Lin. 2004. ROUGE: A Package for Automatic Evaluation of Summaries. Text Summarization Branches Out. [https://aclanthology.org/W04-1013/](https://aclanthology.org/W04-1013/)
+
+[8] Satanjeev Banerjee and Alon Lavie. 2005. METEOR: An Automatic Metric for MT Evaluation with Improved Correlation with Human Judgments. ACL Workshop on Intrinsic and Extrinsic Evaluation Measures. [https://aclanthology.org/W05-0909/](https://aclanthology.org/W05-0909/)
