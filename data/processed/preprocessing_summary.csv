@@ -1,0 +1,4 @@
+split,rows,output,mean_article_tokens,mean_question_tokens,mean_answer_tokens
+train,1000,data/processed/train_processed.csv,184.589,7.71,4.447
+dev,1000,data/processed/dev_processed.csv,193.114,8.005,4.747
+test,1000,data/processed/test_processed.csv,198.679,8.019,4.894

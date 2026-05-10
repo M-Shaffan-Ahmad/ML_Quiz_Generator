@@ -1,0 +1,6 @@
+cluster_id,count,correct_rate,dominant_label,correctness_purity,top_terms
+0,9366,0.2457,0,0.7543,"people, school, like, day, good, time, said, english, old, don"
+1,9589,0.2588,0,0.7412,"people, said, time, like, day, new, make, school, just, years"
+2,9639,0.2777,0,0.7223,"people, said, time, like, day, new, make, just, school, years"
+3,9441,0.2529,0,0.7471,"people, said, time, like, day, new, make, just, school, years"
+4,9965,0.216,0,0.784,"people, said, time, like, day, new, make, school, just, years"

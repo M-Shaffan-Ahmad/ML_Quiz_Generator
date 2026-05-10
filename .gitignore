@@ -1,0 +1,67 @@
+# Python cache / test output
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments and local secrets
+.venv/
+venv/
+env/
+.env
+.env.*
+
+# Notebook / editor / OS noise
+.ipynb_checkpoints/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local assistant/tooling state
+.agents/
+.codex/
+
+# LibreOffice temporary lock files
+.~lock.*
+
+# Full RACE data and generated data tables
+data/raw/
+data/processed/*.csv
+!data/processed/preprocessing_summary.csv
+
+# Large model checkpoints and binary artifacts.
+# Keep small CSV/JSON summaries and plots under models/ so results remain visible.
+models/model_a/neural/
+models/**/checkpoint*/
+models/**/*.joblib
+models/**/*.ckpt
+models/**/*.safetensors
+models/**/*.bin
+models/**/*.pt
+models/**/*.pth
+
+# Scratch/behind-the-scenes experiment folders
+bts/
+wandb/
+mlruns/
+runs/
+outputs/
+checkpoints/
+
+# Local app secrets
+.streamlit/secrets.toml
+
+# Large demo media and local exports
+*.mp4
+*.mov
+*.avi
+*.mkv
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak

@@ -1,0 +1,96 @@
+{
+  "artifact_file": "models/model_b/model_b_artifacts.joblib",
+  "selected_distractor_ranker": "Logistic Regression",
+  "selected_distractor_feature_mode": "full",
+  "selected_hint_ranker": "Logistic Regression",
+  "distractor_results": [
+    {
+      "model": "Logistic Regression",
+      "split": "dev",
+      "feature_mode": "full",
+      "candidate_accuracy": 0.9998767752071717,
+      "candidate_precision": 0.9994666666666666,
+      "candidate_recall": 1.0,
+      "candidate_f1": 0.9997332622032542,
+      "precision_at_3": 0.9994666666666668,
+      "recall_at_3": 1.0,
+      "f1_at_3": 0.9996799999999999,
+      "exact_set_match": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "evaluated_questions": 2500,
+      "confusion_matrix": "[[24961, 4], [0, 7496]]"
+    },
+    {
+      "model": "Logistic Regression",
+      "split": "test",
+      "feature_mode": "full",
+      "candidate_accuracy": 0.9999692175090809,
+      "candidate_precision": 0.9998666133119914,
+      "candidate_recall": 1.0,
+      "candidate_f1": 0.9999333022076969,
+      "precision_at_3": 0.9998666133119914,
+      "recall_at_3": 1.0,
+      "f1_at_3": 0.999919967987195,
+      "exact_set_match": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "evaluated_questions": 2499,
+      "confusion_matrix": "[[24989, 1], [0, 7496]]"
+    },
+    {
+      "model": "Random Forest",
+      "split": "dev",
+      "feature_mode": "structured",
+      "candidate_accuracy": 0.9998767752071717,
+      "candidate_precision": 0.9994666666666666,
+      "candidate_recall": 1.0,
+      "candidate_f1": 0.9997332622032542,
+      "precision_at_3": 0.9994666666666668,
+      "recall_at_3": 1.0,
+      "f1_at_3": 0.9996799999999999,
+      "exact_set_match": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "evaluated_questions": 2500,
+      "confusion_matrix": "[[24961, 4], [0, 7496]]"
+    },
+    {
+      "model": "Random Forest",
+      "split": "test",
+      "feature_mode": "structured",
+      "candidate_accuracy": 0.9999692175090809,
+      "candidate_precision": 0.9998666133119914,
+      "candidate_recall": 1.0,
+      "candidate_f1": 0.9999333022076969,
+      "precision_at_3": 0.9998666133119914,
+      "recall_at_3": 1.0,
+      "f1_at_3": 0.999919967987195,
+      "exact_set_match": 1.0,
+      "mean_reciprocal_rank": 1.0,
+      "evaluated_questions": 2499,
+      "confusion_matrix": "[[24989, 1], [0, 7496]]"
+    }
+  ],
+  "hint_results": [
+    {
+      "model": "Logistic Regression",
+      "split": "dev",
+      "top1_accuracy": 0.7232,
+      "mean_reciprocal_rank": 0.8362078255078255,
+      "evaluated_questions": 2500
+    },
+    {
+      "model": "Logistic Regression",
+      "split": "test",
+      "top1_accuracy": 0.7392,
+      "mean_reciprocal_rank": 0.8436069400774664,
+      "evaluated_questions": 2500
+    }
+  ],
+  "dataset_summary": {
+    "distractor_train_rows": 329863,
+    "distractor_train_positives": 89970,
+    "distractor_skipped_train_questions": 4,
+    "hint_train_rows": 450685,
+    "hint_train_positives": 29991,
+    "hint_skipped_train_questions": 9
+  }
+}

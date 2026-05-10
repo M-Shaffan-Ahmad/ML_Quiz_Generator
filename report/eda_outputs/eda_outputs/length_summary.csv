@@ -1,0 +1,7 @@
+split,level,article_words_mean,article_words_median,article_words_min,article_words_max,question_words_mean,question_words_median,question_words_min,question_words_max,correct_answer_text_words_mean,correct_answer_text_words_median,correct_answer_text_words_min,correct_answer_text_words_max,avg_option_words_mean,avg_option_words_median,avg_option_words_min,avg_option_words_max
+dev,high,308.96,305.0,61,869,9.34,9.0,1,25,6.45,6.0,0,37,6.23,6.25,0.0,22.25
+dev,middle,194.4,198.0,42,413,8.0,8.0,2,25,4.75,4.0,1,33,4.5,4.0,0.75,17.25
+test,high,309.75,298.5,21,836,9.49,9.0,2,31,6.58,6.0,1,25,6.34,6.5,1.0,20.25
+test,middle,197.25,195.0,20,422,7.99,8.0,0,28,4.79,4.0,0,19,4.51,4.0,0.0,20.0
+train,high,313.27,307.0,3,1169,9.51,9.0,0,61,6.47,6.0,0,105,6.28,6.25,0.0,70.0
+train,middle,193.69,190.0,2,529,8.1,8.0,0,61,4.68,4.0,0,28,4.44,4.0,0.0,23.25

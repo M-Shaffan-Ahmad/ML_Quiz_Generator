@@ -1,0 +1,4 @@
+split,train_rows,raw_train_rows_before_balance,skipped_rows,balanced_question_types,best_k,silhouette,question_type_purity,explained_variance_ratio,rows
+train,59973.0,59973.0,27,False,4.0,0.1897900892329807,0.6246644323278808,0.12084383845406037,
+dev,,,0,,,0.20421871502593877,0.6035,,2000.0
+test,,,0,,,0.1852547106840527,0.649,,2000.0

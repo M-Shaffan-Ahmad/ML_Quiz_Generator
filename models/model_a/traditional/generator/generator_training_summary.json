@@ -1,0 +1,46 @@
+{
+  "classifier_results": [
+    {
+      "model": "Logistic Regression",
+      "split": "dev",
+      "accuracy": 0.33824432166973606,
+      "macro_f1": 0.164138798290279
+    },
+    {
+      "model": "Logistic Regression",
+      "split": "test",
+      "accuracy": 0.34049452776651806,
+      "macro_f1": 0.15929210813012254
+    },
+    {
+      "model": "Linear SVM",
+      "split": "dev",
+      "accuracy": 0.4571311643134848,
+      "macro_f1": 0.18382198761693327
+    },
+    {
+      "model": "Linear SVM",
+      "split": "test",
+      "accuracy": 0.47101743007701663,
+      "macro_f1": 0.18328844657196475
+    }
+  ],
+  "ranker_results": [
+    {
+      "split": "dev",
+      "top1_accuracy": 0.9791666666666666,
+      "mean_reciprocal_rank": 0.9850400132275132,
+      "evaluated_questions": 1200,
+      "skipped_questions": 0
+    },
+    {
+      "split": "test",
+      "top1_accuracy": 0.9833333333333333,
+      "mean_reciprocal_rank": 0.9869566798941798,
+      "evaluated_questions": 1200,
+      "skipped_questions": 0
+    }
+  ],
+  "best_classifier": "Linear SVM",
+  "artifact_file": "models/model_a/generator/generator_artifacts.joblib"
+}

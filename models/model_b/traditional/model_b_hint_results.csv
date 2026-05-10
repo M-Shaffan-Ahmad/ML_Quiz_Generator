@@ -1,0 +1,3 @@
+model,split,top1_accuracy,mean_reciprocal_rank,evaluated_questions
+Logistic Regression,dev,0.7232,0.8362078255078255,2500
+Logistic Regression,test,0.7392,0.8436069400774664,2500

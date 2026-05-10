@@ -1,0 +1,1477 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RACE Reading Comprehension Project Slides</title>
+  <style>
+    :root {
+      --paper: #eef2f5;
+      --ink: #182024;
+      --muted: #59666d;
+      --line: #d9e1e5;
+      --panel: #ffffff;
+      --soft: #f5f8f7;
+      --green: #2f7562;
+      --green-dark: #1f5144;
+      --coral: #b55648;
+      --gold: #a77a28;
+      --blue: #286f88;
+      --plum: #74516c;
+      --shadow: 0 24px 72px rgba(24, 32, 36, 0.16);
+      --shadow-soft: 0 10px 28px rgba(24, 32, 36, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      text-rendering: optimizeLegibility;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .deck-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0) 38%),
+        var(--paper);
+    }
+
+    .topbar,
+    .controls {
+      width: min(1220px, calc(100vw - 32px));
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      color: var(--muted);
+    }
+
+    .topbar {
+      padding: 20px 0 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      color: #243039;
+      white-space: nowrap;
+      letter-spacing: 0;
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      border: 1px solid rgba(47, 117, 98, 0.34);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: var(--green-dark);
+      font-size: 0.78rem;
+      font-weight: 850;
+      line-height: 1;
+    }
+
+    .progress {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: min(420px, 48vw);
+    }
+
+    .progress-track {
+      position: relative;
+      height: 6px;
+      border-radius: 999px;
+      background: #dfe6ea;
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .progress-fill {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 0%;
+      border-radius: inherit;
+      background: #243039;
+      transition: width 180ms ease;
+    }
+
+    .slide-count {
+      font-variant-numeric: tabular-nums;
+      font-size: 0.92rem;
+      min-width: 54px;
+      text-align: right;
+    }
+
+    .deck {
+      width: min(1220px, calc(100vw - 32px));
+      margin: 0 auto;
+      display: grid;
+      align-items: center;
+      padding: 12px 0 16px;
+    }
+
+    .slide {
+      display: none;
+      min-height: min(704px, calc(100vh - 154px));
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: clamp(28px, 4vw, 54px);
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .slide > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .slide.active {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    .title-slide {
+      background:
+        linear-gradient(90deg, rgba(47, 117, 98, 0.08), rgba(40, 111, 136, 0.05) 48%, rgba(255, 255, 255, 0) 100%),
+        #fff;
+    }
+
+    .slide::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 7px;
+      background: var(--green);
+    }
+
+    .slide::after {
+      content: attr(data-title);
+      position: absolute;
+      top: 24px;
+      right: clamp(28px, 4vw, 54px);
+      color: rgba(89, 102, 109, 0.5);
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      z-index: 0;
+    }
+
+    .slide:first-child::after {
+      content: "Project Defense";
+    }
+
+    .title-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-bottom: 22px;
+    }
+
+    .title-meta span {
+      border: 1px solid rgba(47, 117, 98, 0.22);
+      background: rgba(255, 255, 255, 0.76);
+      color: #31414a;
+      border-radius: 8px;
+      padding: 8px 11px;
+      font-size: 0.88rem;
+      font-weight: 760;
+      line-height: 1;
+      box-shadow: 0 8px 20px rgba(24, 32, 36, 0.06);
+    }
+
+    .stat-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--line);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .stat-strip div {
+      background: rgba(255, 255, 255, 0.92);
+      padding: 14px 16px;
+    }
+
+    .stat-strip strong {
+      display: block;
+      color: var(--ink);
+      font-size: 1.2rem;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 5px;
+    }
+
+    .stat-strip span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.25;
+    }
+
+    .slide.coral::before {
+      background: var(--coral);
+    }
+
+    .slide.gold::before {
+      background: var(--gold);
+    }
+
+    .slide.blue::before {
+      background: var(--blue);
+    }
+
+    .slide.plum::before {
+      background: var(--plum);
+    }
+
+    .kicker {
+      color: var(--green-dark);
+      font-size: 0.82rem;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      margin: 0 0 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .kicker::before {
+      content: "";
+      width: 24px;
+      height: 2px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+
+    .coral .kicker {
+      color: #914233;
+    }
+
+    .gold .kicker {
+      color: #7a5a1f;
+    }
+
+    .blue .kicker {
+      color: #255b70;
+    }
+
+    .plum .kicker {
+      color: #68455f;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      font-size: clamp(2.55rem, 5.7vw, 5.05rem);
+      line-height: 0.98;
+      letter-spacing: 0;
+      margin-bottom: 20px;
+      max-width: 1050px;
+      font-weight: 850;
+    }
+
+    .title-slide h1 {
+      max-width: 1120px;
+    }
+
+    h2 {
+      font-size: clamp(2rem, 4.2vw, 3.75rem);
+      line-height: 1.03;
+      letter-spacing: 0;
+      margin-bottom: 16px;
+      max-width: 980px;
+      font-weight: 830;
+    }
+
+    h3 {
+      font-size: 1.05rem;
+      line-height: 1.2;
+      margin-bottom: 10px;
+      font-weight: 820;
+    }
+
+    .lede {
+      color: var(--muted);
+      font-size: clamp(1.02rem, 1.55vw, 1.28rem);
+      line-height: 1.45;
+      max-width: 880px;
+      margin-bottom: 0;
+    }
+
+    .tight {
+      max-width: 760px;
+    }
+
+    .layout-2 {
+      display: grid;
+      grid-template-columns: minmax(0, 1.04fr) minmax(320px, 0.96fr);
+      gap: clamp(24px, 4vw, 52px);
+      align-items: center;
+    }
+
+    .layout-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--soft);
+      padding: 20px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .panel.white {
+      background: #fff;
+    }
+
+    .panel h3 {
+      color: var(--ink);
+    }
+
+    .panel-label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      background: #243039;
+      color: #fff;
+      font-size: 0.78rem;
+      font-weight: 820;
+      line-height: 1;
+    }
+
+    .panel p,
+    .panel li {
+      color: var(--muted);
+      line-height: 1.45;
+      margin-bottom: 0;
+    }
+
+    ul.clean {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 14px;
+    }
+
+    .dot-list {
+      padding-left: 20px;
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .dot-list li {
+      margin-bottom: 8px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 17px;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      background: var(--green);
+    }
+
+    .coral .metric::before {
+      background: var(--coral);
+    }
+
+    .gold .metric::before {
+      background: var(--gold);
+    }
+
+    .blue .metric::before {
+      background: var(--blue);
+    }
+
+    .plum .metric::before {
+      background: var(--plum);
+    }
+
+    .metric strong {
+      display: block;
+      color: var(--ink);
+      font-size: clamp(1.42rem, 3.3vw, 2.65rem);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 8px;
+      font-weight: 850;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.25;
+      display: block;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: var(--shadow-soft);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      min-width: 0;
+    }
+
+    th,
+    td {
+      padding: 11px 13px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      overflow-wrap: anywhere;
+    }
+
+    th {
+      background: #eff4f6;
+      color: var(--green-dark);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    tbody tr:nth-child(even) td {
+      background: #fafcfc;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .number {
+      font-variant-numeric: tabular-nums;
+      font-weight: 750;
+      color: var(--ink);
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 8px 10px;
+      background: #fff;
+      color: #31414a;
+      font-size: 0.86rem;
+      font-weight: 740;
+      line-height: 1.1;
+      box-shadow: 0 5px 14px rgba(24, 32, 36, 0.05);
+    }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .step {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 17px;
+      background: #fff;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .step::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 4px;
+      border-radius: 8px 8px 0 0;
+      background: var(--green);
+    }
+
+    .coral .step::before {
+      background: var(--coral);
+    }
+
+    .gold .step::before {
+      background: var(--gold);
+    }
+
+    .blue .step::before {
+      background: var(--blue);
+    }
+
+    .plum .step::before {
+      background: var(--plum);
+    }
+
+    .step small {
+      color: var(--muted);
+      line-height: 1.35;
+      display: block;
+      margin-top: 10px;
+    }
+
+    .step strong {
+      display: block;
+      color: var(--ink);
+      line-height: 1.2;
+      font-weight: 820;
+    }
+
+    .step::after {
+      content: "";
+      position: absolute;
+      right: -8px;
+      top: 50%;
+      width: 10px;
+      height: 10px;
+      border-top: 2px solid var(--green);
+      border-right: 2px solid var(--green);
+      transform: translateY(-50%) rotate(45deg);
+      background: transparent;
+      z-index: 1;
+    }
+
+    .step:last-child::after {
+      display: none;
+    }
+
+    .chart-pair {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    figure {
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+      box-shadow: var(--shadow-soft);
+    }
+
+    figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 286px;
+      object-fit: contain;
+      background: #fff;
+    }
+
+    figcaption {
+      padding: 10px 12px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      border-top: 1px solid var(--line);
+      background: #f8fafb;
+    }
+
+    .bars {
+      display: grid;
+      gap: 14px;
+      padding: 10px 0;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 132px 1fr 56px;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .bar-track {
+      height: 12px;
+      background: #e3eaee;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: var(--green);
+    }
+
+    .bar-fill.coral {
+      background: var(--coral);
+    }
+
+    .bar-fill.gold {
+      background: var(--gold);
+    }
+
+    .bar-fill.blue {
+      background: var(--blue);
+    }
+
+    .codebox {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f7f9fa;
+      padding: 18px;
+      overflow-x: auto;
+      color: #243026;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      white-space: pre;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .reference-list {
+      column-count: 2;
+      column-gap: 28px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 22px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .reference-list p {
+      break-inside: avoid;
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.35;
+    }
+
+    .reference-list a {
+      color: var(--blue);
+      font-weight: 760;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .caption {
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    .controls {
+      padding: 8px 0 18px;
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .nav-button {
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--ink);
+      min-width: 42px;
+      height: 38px;
+      padding: 0 12px;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(24, 32, 36, 0.07);
+    }
+
+    .nav-button:hover,
+    .nav-button:focus-visible {
+      outline: 2px solid rgba(62, 122, 98, 0.28);
+      outline-offset: 2px;
+      border-color: var(--green);
+    }
+
+    .nav-button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .hint {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .footnote {
+      position: absolute;
+      left: clamp(28px, 4vw, 54px);
+      right: clamp(28px, 4vw, 54px);
+      bottom: 22px;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    @media (max-width: 920px) {
+      .topbar,
+      .controls {
+        width: min(100vw - 20px, 760px);
+      }
+
+      .deck {
+        width: min(100vw - 20px, 760px);
+      }
+
+      .slide {
+        min-height: calc(100vh - 144px);
+        padding: 26px;
+      }
+
+      .layout-2,
+      .layout-3,
+      .pipeline,
+      .chart-pair,
+      .metric-grid,
+      .stat-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .step::after {
+        right: auto;
+        left: 26px;
+        top: auto;
+        bottom: -8px;
+        transform: rotate(135deg);
+      }
+
+      .progress {
+        min-width: 0;
+        width: 100%;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .footnote {
+        position: static;
+        margin-top: 4px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .slide {
+        padding: 22px;
+      }
+
+      .bar-row {
+        grid-template-columns: 1fr;
+        gap: 5px;
+      }
+
+      .reference-list {
+        column-count: 1;
+      }
+
+      .controls {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .topbar,
+      .controls {
+        display: none;
+      }
+
+      .deck {
+        width: 100%;
+        padding: 0;
+        display: block;
+      }
+
+      .slide,
+      .slide.active {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 24px;
+        box-shadow: none;
+        border: 1px solid #999;
+        min-height: 100vh;
+        page-break-after: always;
+        border-radius: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="deck-shell">
+    <header class="topbar" aria-label="Presentation status">
+      <div class="brand">
+        <span class="brand-mark">RC</span>
+        <span>RACE Project Slides</span>
+      </div>
+      <div class="progress">
+        <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="slide-count" id="slideCount">1 / 20</div>
+      </div>
+    </header>
+
+    <main class="deck" id="deck">
+      <section class="slide active title-slide" data-title="Title">
+        <div>
+          <div class="title-meta">
+            <span>RACE dataset</span>
+            <span>Model A + Model B</span>
+            <span>Classical ML + BERT</span>
+            <span>Streamlit demo</span>
+          </div>
+          <p class="kicker">AI project presentation</p>
+          <h1>RACE Reading Comprehension Project</h1>
+          <p class="lede tight">An end-to-end quiz system that verifies answers, generates questions, creates distractors and hints, and exposes everything through a Streamlit interface.</p>
+        </div>
+        <div class="stat-strip" aria-label="Project summary metrics">
+          <div><strong>87,866</strong><span>training questions</span></div>
+          <div><strong>0.5431</strong><span>best test BLEU</span></div>
+          <div><strong>0.6073</strong><span>best test ROUGE-L</span></div>
+          <div><strong>0.7392</strong><span>hint top-1 accuracy</span></div>
+        </div>
+        <div class="layout-3">
+          <div class="panel">
+            <span class="panel-label">A</span>
+            <h3>Model A</h3>
+            <p>Answer verification plus supervised question generation.</p>
+          </div>
+          <div class="panel">
+            <span class="panel-label">B</span>
+            <h3>Model B</h3>
+            <p>Passage-grounded distractors and graduated hints.</p>
+          </div>
+          <div class="panel">
+            <span class="panel-label">UI</span>
+            <h3>UI</h3>
+            <p>Interactive quiz flow with analytics and backend switching.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide blue" data-title="Abstract">
+        <div>
+          <p class="kicker">Abstract</p>
+          <h2>End-to-end reading comprehension quiz generation and evaluation.</h2>
+          <p class="lede">This project builds a RACE-based quiz system that preprocesses official splits, verifies multiple-choice answers, generates questions, creates plausible distractors, ranks progressive hints, and exposes the workflow through Streamlit. Model A combines a classical LR + XGBoost verifier, a supervised template-based question generator, an unsupervised clustering layer, and an optional BERT multiple-choice backend. Model B adds distractor and hint generation with supervised ranking and passage-grounded candidate extraction. Evaluation uses BLEU, ROUGE-L, METEOR, exact-match diagnostics, Precision@3, Recall@3, F1@3, top-1 hint accuracy, and MRR.</p>
+        </div>
+        <div class="metric-grid">
+          <div class="metric"><strong>0.5431</strong><span>best Model A test BLEU</span></div>
+          <div class="metric"><strong>0.6073</strong><span>best Model A test ROUGE-L</span></div>
+          <div class="metric"><strong>0.5172</strong><span>best Model A exact diagnostic</span></div>
+          <div class="metric"><strong>0.7392</strong><span>Model B hint top-1 accuracy</span></div>
+        </div>
+      </section>
+
+      <section class="slide coral" data-title="Introduction">
+        <div class="layout-2">
+          <div>
+            <p class="kicker">Introduction & Motivation</p>
+            <h2>Turn passages into an interactive reading quiz.</h2>
+            <p class="lede">The system starts from a RACE passage and supports both the learner-facing experience and the developer-facing model evaluation workflow.</p>
+          </div>
+          <div class="panel white">
+            <ul class="clean">
+              <li><strong>Input:</strong> article, question, and four candidate answers from RACE or custom text.</li>
+              <li><strong>Model A:</strong> rank answer options and generate answerable questions.</li>
+              <li><strong>Model B:</strong> generate three plausible wrong options and three hint levels.</li>
+              <li><strong>Output:</strong> quiz view, answer checking, hints, model scores, latency, and downloadable results.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide plum" data-title="Related Work">
+        <div>
+          <p class="kicker">Related Work</p>
+          <h2>The project is grounded in established NLP and ML research.</h2>
+          <p class="lede">The techniques used in the project map directly to reading-comprehension datasets, vector-space text matching, supervised classifiers, ensemble ranking, clustering, neural language models, and automatic text evaluation.</p>
+        </div>
+        <div class="layout-2">
+          <div class="panel white">
+            <ul class="dot-list">
+              <li>RACE provides exam-style reading-comprehension passages and questions [1].</li>
+              <li>Logistic Regression provides the classical binary option-scoring baseline [2].</li>
+              <li>Random Forest and XGBoost support tree-based ranking and boosted model comparison [3-4].</li>
+              <li>BERT provides the advanced multiple-choice verifier backend [5].</li>
+              <li>ROUGE and METEOR support the answer-text evaluation discussion [6-7].</li>
+            </ul>
+          </div>
+          <div class="panel white">
+            <h3>Evaluation papers</h3>
+            <p>The project still reports BLEU, ROUGE-L, and METEOR, while the remaining references cite the evaluation papers kept in the bibliography.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide gold" data-title="Dataset Analysis">
+        <div>
+          <p class="kicker">Dataset Analysis</p>
+          <h2>Clean RACE splits with no exact leakage.</h2>
+          <p class="lede">The project uses the official train, dev, and test splits across middle-school and high-school reading passages.</p>
+        </div>
+        <div class="metric-grid">
+          <div class="metric"><strong>87,866</strong><span>training questions</span></div>
+          <div class="metric"><strong>4,887</strong><span>dev questions</span></div>
+          <div class="metric"><strong>4,934</strong><span>test questions</span></div>
+          <div class="metric"><strong>0</strong><span>exact article or id overlaps across splits</span></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Split</th><th>Questions</th><th>Passages</th><th>Avg article words</th><th>Avg question words</th><th>Avg answer words</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>train</td><td class="number">87,866</td><td class="number">25,135</td><td>278.67</td><td>9.10</td><td>5.95</td></tr>
+              <tr><td>dev</td><td class="number">4,887</td><td class="number">1,389</td><td>275.30</td><td>8.94</td><td>5.95</td></tr>
+              <tr><td>test</td><td class="number">4,934</td><td class="number">1,407</td><td>277.01</td><td>9.05</td><td>6.06</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="slide blue" data-title="EDA">
+        <div>
+          <p class="kicker">EDA signals</p>
+          <h2>Lexical overlap helps, but it is not enough.</h2>
+          <p class="lede">The strongest simple baseline picks the option with highest article-option overlap, which justifies similarity features while showing room for learned ranking.</p>
+        </div>
+        <div class="chart-pair">
+          <figure>
+            <img src="report/eda_outputs/eda_outputs/baseline_metrics.png" alt="Baseline metrics chart">
+            <figcaption>Simple baselines: article-option overlap is the strongest non-trained signal.</figcaption>
+          </figure>
+          <figure>
+            <img src="report/eda_outputs/eda_outputs/answer_distribution.png" alt="Answer distribution chart">
+            <figcaption>Answer positions are close to balanced, with C slightly most common in train.</figcaption>
+          </figure>
+        </div>
+        <div class="metric-grid">
+          <div class="metric"><strong>0.3733</strong><span>test BLEU, article-overlap baseline</span></div>
+          <div class="metric"><strong>0.4514</strong><span>test ROUGE-L, article-overlap baseline</span></div>
+          <div class="metric"><strong>0.4065</strong><span>test METEOR, article-overlap baseline</span></div>
+          <div class="metric"><strong>0.3245</strong><span>test exact diagnostic baseline</span></div>
+        </div>
+      </section>
+
+      <section class="slide plum" data-title="Architecture">
+        <div>
+          <p class="kicker">System architecture</p>
+          <h2>A reproducible pipeline from raw RACE files to quiz UI.</h2>
+        </div>
+        <div class="pipeline" aria-label="Project pipeline">
+          <div class="step">
+            <strong>1. Data ingest</strong>
+            <small>Read RACE JSON/CSV splits and normalize article, question, options, and answers.</small>
+          </div>
+          <div class="step">
+            <strong>2. Features</strong>
+            <small>Build sparse text features plus cosine, overlap, length, answer-position, and relative-option features.</small>
+          </div>
+          <div class="step">
+            <strong>3. Model A</strong>
+            <small>Classical LR + XGBoost baseline, optional BERT multiple-choice backend, and question generation.</small>
+          </div>
+          <div class="step">
+            <strong>4. Model B</strong>
+            <small>Generate distractors and rank evidence sentences for progressive hints.</small>
+          </div>
+          <div class="step">
+            <strong>5. Streamlit UI</strong>
+            <small>Run the quiz, switch backends, inspect scores, and export analytics.</small>
+          </div>
+        </div>
+        <div class="tag-row">
+          <span class="tag">src/preprocessing.py</span>
+          <span class="tag">src/model_a_train.py</span>
+          <span class="tag">src/model_b_train.py</span>
+          <span class="tag">src/inference.py</span>
+          <span class="tag">src/evaluate.py</span>
+          <span class="tag">ui/app.py</span>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Features">
+        <div class="layout-2">
+          <div>
+            <p class="kicker">Preprocessing and feature engineering</p>
+            <h2>The classical model learns how options compare within the same question.</h2>
+            <p class="lede">The key improvement was moving beyond independent option rows and adding question-relative features across A, B, C, and D.</p>
+          </div>
+          <div class="panel white">
+            <ul class="dot-list">
+              <li>TF-IDF cosine: question-option, article-option, and question-article.</li>
+              <li>Lexical overlap: article-option and question-option Jaccard scores.</li>
+              <li>Length and ratio features for article, question, and option text.</li>
+              <li>Option-position one-hot features for A, B, C, and D.</li>
+              <li>Within-question ranks, max flags, z-scores, and differences from group mean/max/min.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Classical model</th><th>Split</th><th>BLEU</th><th>ROUGE-L</th><th>METEOR</th><th>Exact diagnostic</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Before relative features</td><td>test</td><td>0.4069</td><td>0.4847</td><td>0.4336</td><td>0.3640</td></tr>
+              <tr><td>With relative features</td><td>test</td><td class="number">0.4106</td><td class="number">0.4922</td><td class="number">0.4438</td><td class="number">0.3739</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="slide coral" data-title="Classical Model A">
+        <div>
+          <p class="kicker">Model A classical verifier</p>
+          <h2>LR + XGBoost is the assignment-aligned final classical baseline.</h2>
+          <p class="lede">It keeps the matrix sparse, combines traditional supervised models, and beats the strongest simple baseline on all required test metrics.</p>
+        </div>
+        <div class="layout-2">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Model</th><th>Test BLEU</th><th>ROUGE-L</th><th>METEOR</th><th>Exact</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Logistic Regression</td><td>0.3963</td><td>0.4717</td><td>0.4214</td><td>0.3490</td></tr>
+                <tr><td>Linear SVM</td><td>0.4032</td><td>0.4768</td><td>0.4265</td><td>0.3539</td></tr>
+                <tr><td>XGBoost</td><td>0.4017</td><td>0.4828</td><td>0.4309</td><td>0.3608</td></tr>
+                <tr><td>LR + XGBoost final</td><td class="number">0.4106</td><td class="number">0.4922</td><td class="number">0.4438</td><td class="number">0.3739</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="panel">
+            <h3>Why this matters</h3>
+            <p>The classical model satisfies the traditional ML requirement while staying interpretable: text similarity, option position, length, and within-question competition all have clear roles.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide gold" data-title="BERT">
+        <div>
+          <p class="kicker">Advanced backend</p>
+          <h2>BERT multiple-choice is the strongest measured Model A.</h2>
+          <p class="lede">The best checkpoint was trained in two stages on 60,000 unique RACE questions and uses the RTX 3060 GPU when available.</p>
+        </div>
+        <div class="metric-grid">
+          <div class="metric"><strong>0.5431</strong><span>test BLEU</span></div>
+          <div class="metric"><strong>0.6073</strong><span>test ROUGE-L</span></div>
+          <div class="metric"><strong>0.5526</strong><span>test METEOR</span></div>
+          <div class="metric"><strong>0.5172</strong><span>test exact diagnostic</span></div>
+        </div>
+        <div class="layout-2">
+          <div class="bars" aria-label="BERT test exact progression">
+            <div class="bar-row"><span>BERT MC 10k</span><div class="bar-track"><div class="bar-fill coral" style="width: 42.58%"></div></div><span>0.4258</span></div>
+            <div class="bar-row"><span>BERT MC 30k</span><div class="bar-track"><div class="bar-fill gold" style="width: 45.50%"></div></div><span>0.4550</span></div>
+            <div class="bar-row"><span>BERT MC 60k</span><div class="bar-track"><div class="bar-fill" style="width: 51.72%"></div></div><span>0.5172</span></div>
+          </div>
+          <div class="panel white">
+            <h3>Key finding</h3>
+            <p>Binary BERT underperformed because option-row accuracy is not the same as selecting one correct answer. The multiple-choice objective matches the task directly.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide blue" data-title="Question Generation">
+        <div>
+          <p class="kicker">Model A generation</p>
+          <h2>Question generation is a supervised hybrid, not just cloze blanks.</h2>
+          <p class="lede">The generator extracts answer spans, predicts question type, applies WH/cloze templates, and ranks generated candidates.</p>
+        </div>
+        <div class="pipeline">
+          <div class="step"><strong>Span extraction</strong><small>Named entities, numbers, dates, noun-like spans, and content words.</small></div>
+          <div class="step"><strong>Type classifier</strong><small>Linear SVM over cloze, who, what, where, when, why, how_many, which, other.</small></div>
+          <div class="step"><strong>Templates</strong><small>Typed WH questions plus robust cloze fallback.</small></div>
+          <div class="step"><strong>Ranker</strong><small>Random Forest ranks candidates for usefulness.</small></div>
+          <div class="step"><strong>UI display</strong><small>Shows question type, confidence, rank score, answer, and source sentence.</small></div>
+        </div>
+        <div class="metric-grid">
+          <div class="metric"><strong>0.4710</strong><span>test accuracy, SVM question-type classifier</span></div>
+          <div class="metric"><strong>0.1833</strong><span>test macro-F1, low due to class imbalance</span></div>
+          <div class="metric"><strong>0.9833</strong><span>test top-1 candidate ranker accuracy</span></div>
+          <div class="metric"><strong>0.9870</strong><span>test mean reciprocal rank</span></div>
+        </div>
+      </section>
+
+      <section class="slide plum" data-title="Unsupervised">
+        <div>
+          <p class="kicker">Unsupervised Model A layer</p>
+          <h2>K-Means adds discovery and metadata, not the final answer decision.</h2>
+          <p class="lede">Clustering satisfies the unsupervised requirement and helps explain broad question/answer patterns, but supervised verification remains stronger.</p>
+        </div>
+        <div class="chart-pair">
+          <figure>
+            <img src="models/model_a/traditional/unsupervised/question_cluster_dendrogram.png" alt="Question cluster dendrogram">
+            <figcaption>Question-form clustering: best K = 4, test purity = 0.6490.</figcaption>
+          </figure>
+          <figure>
+            <img src="models/model_a/traditional/unsupervised/answer_cluster_dendrogram.png" alt="Answer cluster dendrogram">
+            <figcaption>Answer-option clustering: best K = 5, test silhouette = 0.3183.</figcaption>
+          </figure>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Clustering task</th><th>Best K</th><th>Test silhouette</th><th>Useful outcome</th><th>Limitation</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Question types</td><td>4</td><td>0.1853</td><td>Finds broad cloze, which, and title-style groups</td><td>Types overlap</td></tr>
+              <tr><td>Answer options</td><td>5</td><td>0.3183</td><td>Finds cleaner geometric clusters</td><td>Test answer accuracy only 0.2675</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Model B">
+        <div>
+          <p class="kicker">Model B distractors and hints</p>
+          <h2>Model B completes the quiz: wrong options plus support hints.</h2>
+          <p class="lede">It uses question-type control, passage candidates, supervised ranking, diversity filtering, and evidence sentence ranking.</p>
+        </div>
+        <div class="layout-2">
+          <div class="panel white">
+            <h3>Distractor generator</h3>
+            <ul class="dot-list">
+              <li>Uses official wrong options as supervised positive examples.</li>
+              <li>Ranks passage and option-pool candidates with Logistic Regression and Random Forest comparisons.</li>
+              <li>Applies type compatibility, lexical similarity, passage frequency, and diversity filters.</li>
+            </ul>
+          </div>
+          <div class="panel white">
+            <h3>Hint generator</h3>
+            <ul class="dot-list">
+              <li>Ranks evidence sentences using overlap, answer presence, sentence length, and sentence position.</li>
+              <li>Shows Hint 1 vague, Hint 2 contextual, and Hint 3 near-explicit with the answer masked.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="metric-grid">
+          <div class="metric"><strong>0.9999</strong><span>test Precision@3, distractor option-pool ranking</span></div>
+          <div class="metric"><strong>1.0000</strong><span>test Recall@3, distractor option-pool ranking</span></div>
+          <div class="metric"><strong>0.7392</strong><span>test top-1 hint sentence accuracy</span></div>
+          <div class="metric"><strong>0.8436</strong><span>test hint sentence MRR</span></div>
+        </div>
+      </section>
+
+      <section class="slide coral" data-title="UI">
+        <div>
+          <p class="kicker">Streamlit application</p>
+          <h2>The UI demonstrates the full system end to end.</h2>
+          <p class="lede">It is built for a passage-first quiz workflow and exposes enough developer analytics for grading and debugging.</p>
+        </div>
+        <div class="layout-3">
+          <div class="panel white">
+            <h3>1. Article input</h3>
+            <p>Load RACE samples, browse previous/next/random examples, or paste a custom passage.</p>
+          </div>
+          <div class="panel white">
+            <h3>2. Quiz view</h3>
+            <p>Generate a question, mix the correct answer with Model B distractors, and check the selected answer.</p>
+          </div>
+          <div class="panel white">
+            <h3>3. Hint panel</h3>
+            <p>Reveal three progressive hints before showing the final answer.</p>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Developer dashboard</h3>
+          <p>Backend selector, option score table, confidence chart, Model A accuracy/precision/recall/F1, confusion matrix, Model B tables, latency tracking, CSV export, and JSON download.</p>
+        </div>
+      </section>
+
+      <section class="slide gold" data-title="Artifacts">
+        <div>
+          <p class="kicker">Project artifacts</p>
+          <h2>The repo is organized for training, inference, evaluation, and reporting.</h2>
+        </div>
+        <div class="layout-2">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Area</th><th>Important files</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Data</td><td>data/raw, data/processed, report/eda_outputs</td></tr>
+                <tr><td>Model A</td><td>src/model_a_inference.py, src/model_a_generation.py, models/model_a</td></tr>
+                <tr><td>Model B</td><td>src/model_b.py, src/train_model_b.py, models/model_b/traditional</td></tr>
+                <tr><td>Rubric entrypoints</td><td>src/preprocessing.py, src/model_a_train.py, src/model_b_train.py, src/inference.py, src/evaluate.py</td></tr>
+                <tr><td>Presentation/reporting</td><td>README.md, report/final_report.md, report/final_report.pdf</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="codebox">../venv/bin/streamlit run app.py
+
+../venv/bin/python src/model_a_inference.py --backend classical ...
+
+../venv/bin/python src/model_b.py --article "..." --question "..." --correct-answer "..."
+
+../venv/bin/python src/evaluate.py</div>
+        </div>
+      </section>
+
+      <section class="slide blue" data-title="Evaluation">
+        <div>
+          <p class="kicker">Evaluation & Discussion</p>
+          <h2>What mattered most in the results.</h2>
+        </div>
+        <div class="layout-2">
+          <div class="panel white">
+            <ul class="dot-list">
+              <li>Article-option lexical overlap is a useful baseline signal, but learned models outperform it.</li>
+              <li>Within-question relative features improved the classical verifier on every required test metric.</li>
+              <li>BERT multiple-choice works better than binary answer verification because it matches the four-way decision.</li>
+              <li>Question generation benefits from typed templates plus a learned candidate ranker.</li>
+              <li>K-Means is useful for analysis and metadata, not as the main answer selector.</li>
+              <li>Model B makes the demo complete by generating distractors and progressive hints.</li>
+            </ul>
+          </div>
+          <figure>
+            <img src="report/assets/3comaprisons.png" alt="Project model comparison visual">
+            <figcaption>Saved report comparison visual from the project assets.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="slide coral" data-title="Limitations">
+        <div>
+          <p class="kicker">Limitations & Future Work</p>
+          <h2>Strong project coverage, with clear next steps.</h2>
+          <p class="lede">The system is reproducible and feature-complete, but deeper semantics and human evaluation would make the work stronger.</p>
+        </div>
+        <div class="layout-2">
+          <div class="panel white">
+            <h3>Limitations</h3>
+            <ul class="dot-list">
+              <li>Classical verification can miss paraphrase-heavy or multi-sentence reasoning cases.</li>
+              <li>BERT performs better but needs more compute and checkpoint management.</li>
+              <li>Template question generation is explainable, but some WH questions sound rigid.</li>
+              <li>Model B distractor metrics are strongest in the option-pool evaluation setting.</li>
+            </ul>
+          </div>
+          <div class="panel white">
+            <h3>Future work</h3>
+            <ul class="dot-list">
+              <li>Add semantic distractor evaluation and human quality ratings.</li>
+              <li>Try stronger neural generation or retrieval-augmented generation for questions.</li>
+              <li>Run ablation studies for feature groups, question types, and hint features.</li>
+              <li>Calibrate confidence scores for safer UI feedback.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide plum" data-title="Demo">
+        <div class="layout-2">
+          <div>
+            <p class="kicker">Suggested presentation flow</p>
+            <h2>Demo the system in the same order the user experiences it.</h2>
+            <p class="lede">Start with a RACE passage, run generation, answer the quiz, reveal hints, then switch to the analytics dashboard to connect the demo back to the measured results.</p>
+          </div>
+          <div class="panel white">
+            <ul class="clean">
+              <li><strong>1.</strong> Load a RACE sample or paste a custom article.</li>
+              <li><strong>2.</strong> Generate a question and correct answer with Model A.</li>
+              <li><strong>3.</strong> Use Model B distractors to form the quiz options.</li>
+              <li><strong>4.</strong> Reveal hints and check an answer.</li>
+              <li><strong>5.</strong> Show backend metrics, option scores, and exports.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="metric-grid">
+          <div class="metric"><strong>Model A</strong><span>verifies and generates</span></div>
+          <div class="metric"><strong>Model B</strong><span>distracts and hints</span></div>
+          <div class="metric"><strong>BERT</strong><span>best measured verifier</span></div>
+          <div class="metric"><strong>UI</strong><span>complete quiz workflow</span></div>
+        </div>
+      </section>
+
+      <section class="slide gold" data-title="Conclusion">
+        <div>
+          <p class="kicker">Conclusion</p>
+          <h2>The project delivers the full reading-comprehension quiz pipeline.</h2>
+          <p class="lede">The final system combines clean RACE preprocessing, classical and neural answer verification, supervised question generation, unsupervised analysis, distractor generation, hint ranking, and a usable Streamlit interface. BERT multiple-choice is the strongest measured verifier, while LR + XGBoost remains the best rubric-aligned classical baseline.</p>
+        </div>
+        <div class="metric-grid">
+          <div class="metric"><strong>Dataset</strong><span>clean splits, no exact leakage</span></div>
+          <div class="metric"><strong>Model A</strong><span>verification and question generation</span></div>
+          <div class="metric"><strong>Model B</strong><span>distractors and hints</span></div>
+          <div class="metric"><strong>UI</strong><span>end-to-end demo and analytics</span></div>
+        </div>
+      </section>
+
+      <section class="slide" data-title="References">
+        <div>
+          <p class="kicker">References</p>
+          <h2>Research papers behind the project techniques.</h2>
+        </div>
+        <div class="reference-list">
+          <p>[1] <a href="https://aclanthology.org/D17-1082/" target="_blank" rel="noopener noreferrer">Lai et al. 2017. RACE: Large-scale ReAding Comprehension Dataset From Examinations.</a></p>
+          <p>[2] <a href="https://doi.org/10.1111/j.2517-6161.1958.tb00292.x" target="_blank" rel="noopener noreferrer">Cox. 1958. The Regression Analysis of Binary Sequences.</a></p>
+          <p>[3] <a href="https://doi.org/10.1023/A:1010933404324" target="_blank" rel="noopener noreferrer">Breiman. 2001. Random Forests.</a></p>
+          <p>[4] <a href="https://doi.org/10.1145/2939672.2939785" target="_blank" rel="noopener noreferrer">Chen and Guestrin. 2016. XGBoost: A Scalable Tree Boosting System.</a></p>
+          <p>[5] <a href="https://aclanthology.org/N19-1423/" target="_blank" rel="noopener noreferrer">Devlin et al. 2019. BERT: Pre-training of Deep Bidirectional Transformers.</a></p>
+          <p>[6] <a href="https://aclanthology.org/W04-1013/" target="_blank" rel="noopener noreferrer">Lin. 2004. ROUGE: A Package for Automatic Evaluation of Summaries.</a></p>
+          <p>[7] <a href="https://aclanthology.org/W05-0909/" target="_blank" rel="noopener noreferrer">Banerjee and Lavie. 2005. METEOR: An Automatic Metric for MT Evaluation.</a></p>
+        </div>
+        <p class="footnote">Open this file in a browser. Use arrow keys to navigate, Home/End to jump, and the browser print dialog to export to PDF.</p>
+      </section>
+
+    </main>
+
+    <footer class="controls" aria-label="Slide controls">
+      <div class="control-group">
+        <button class="nav-button" id="prevBtn" type="button" aria-label="Previous slide" title="Previous slide">&lt;</button>
+        <button class="nav-button" id="nextBtn" type="button" aria-label="Next slide" title="Next slide">&gt;</button>
+        <button class="nav-button" id="printBtn" type="button">Print</button>
+      </div>
+      <div class="hint">Use left/right arrows. Press F11 for full screen.</div>
+    </footer>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const progressFill = document.getElementById("progressFill");
+    const slideCount = document.getElementById("slideCount");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const printBtn = document.getElementById("printBtn");
+    let current = 0;
+
+    function parseHash() {
+      const match = window.location.hash.match(/slide-(\d+)/);
+      if (!match) return 0;
+      const requested = Number(match[1]) - 1;
+      return Number.isFinite(requested) ? requested : 0;
+    }
+
+    function showSlide(index, pushHash = true) {
+      current = Math.max(0, Math.min(slides.length - 1, index));
+      slides.forEach((slide, slideIndex) => {
+        slide.classList.toggle("active", slideIndex === current);
+      });
+      const percent = ((current + 1) / slides.length) * 100;
+      progressFill.style.width = `${percent}%`;
+      slideCount.textContent = `${current + 1} / ${slides.length}`;
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current === slides.length - 1;
+      document.title = `${current + 1}. ${slides[current].dataset.title} - RACE Project Slides`;
+      if (pushHash) {
+        history.replaceState(null, "", `#slide-${current + 1}`);
+      }
+    }
+
+    function nextSlide() {
+      showSlide(current + 1);
+    }
+
+    function previousSlide() {
+      showSlide(current - 1);
+    }
+
+    prevBtn.addEventListener("click", previousSlide);
+    nextBtn.addEventListener("click", nextSlide);
+    printBtn.addEventListener("click", () => window.print());
+
+    window.addEventListener("keydown", (event) => {
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
+      if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") {
+        event.preventDefault();
+        nextSlide();
+      }
+      if (event.key === "ArrowLeft" || event.key === "PageUp") {
+        event.preventDefault();
+        previousSlide();
+      }
+      if (event.key === "Home") {
+        event.preventDefault();
+        showSlide(0);
+      }
+      if (event.key === "End") {
+        event.preventDefault();
+        showSlide(slides.length - 1);
+      }
+    });
+
+    window.addEventListener("hashchange", () => showSlide(parseHash(), false));
+    showSlide(parseHash(), false);
+  </script>
+</body>
+</html>

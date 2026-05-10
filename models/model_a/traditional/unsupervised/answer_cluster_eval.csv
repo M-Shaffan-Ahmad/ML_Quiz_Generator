@@ -1,0 +1,4 @@
+split,train_questions,train_option_rows,best_k,silhouette,correctness_purity,explained_variance_ratio,questions,option_rows,cluster_prior_answer_accuracy
+train,12000.0,48000.0,5.0,0.31791332849834697,0.75,0.6577461172206749,,,
+dev,,,,0.3170507697920692,0.75,,2000.0,8000.0,0.27
+test,,,,0.31825794987447403,0.75,,2000.0,8000.0,0.2675
